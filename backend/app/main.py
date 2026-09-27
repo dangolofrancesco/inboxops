@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.applications import router as applications_router
 
 app = FastAPI(
     title="InboxOps API",
@@ -7,10 +8,6 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Starlette builds the middleware stack lazily on the first request, wrapping
-# whatever is registered at that point. Adding CORSMiddleware here, before any
-# routes/routers are included, guarantees it wraps every endpoint (including
-# ones added later) rather than depending on registration order elsewhere.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -19,7 +16,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(applications_router)
 
 @app.get("/health")
-def health() -> dict[str, str]:
+def health_check():
     return {"status": "ok", "service": "inboxops-api", "version": "0.1.0"}
+
+    
